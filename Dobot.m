@@ -8,37 +8,37 @@ classdef Dobot < handle
     end
     
     methods
-        function self = Dobot()    
+        function self = Dobot(base, pose)    
             %> Define the boundaries of the workspace
 
             % robot = 
-            self.GetDobot();
-            self.PlotAndColourDobot();
+            self.GetDobot(base);
+            self.PlotAndColourDobot(pose);
 
         end
 
         %% GetDobot
         % Given a name (optional), create and return a Dobot model
-        function GetDobot(self)
+        function GetDobot(self, base)
             % Create a unique name (ms timestamp after 1ms pause)
             pause(0.001);
             name = ['Dobot',datestr(now,'yyyymmddTHHMMSSFFF')];
 
             % Create the UR3 model mounted on a linear rail
-            L(1) = Link('d',0.138,'a',0,     'alpha',-pi/2, 'offset',0,     'qlim',[deg2rad(-135),deg2rad(135)]);
-            L(2) = Link('d',0,     'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
-            L(3) = Link('d',0,     'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
-            L(4) = Link('d',0,     'a',0.078, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
-            L(5) = Link('d',0,     'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
+            L(1) = Link('d',0.138,   'a',0,     'alpha',-pi/2, 'offset',0,     'qlim',[deg2rad(-135),deg2rad(135)]);
+            L(2) = Link('d',0,       'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
+            L(3) = Link('d',0,       'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
+            L(4) = Link('d',0,       'a',0.061, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
+            L(5) = Link('d',-0.0385, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
  
             self.model = SerialLink(L,'name',name);
 
             % Rotate robot to the correct orientation
-            self.model.base = eye(4);
+            self.model.base = base;
         end
         
         %% PlotAndColourRobot
-        function PlotAndColourDobot(self)%robot,workspace
+        function PlotAndColourDobot(self, pose)%robot,workspace
             for linkIndex = 0:self.model.n
                 [ faceData, vertexData, plyData{linkIndex+1} ] = plyread(['Dobot',num2str(linkIndex),'.ply'],'tri'); %#ok<AGROW>
             
@@ -47,7 +47,7 @@ classdef Dobot < handle
             end
 
             % Display robot
-            self.model.plot3d([0    0.5700    1.1800    1.3916         0],'noarrow','workspace',self.workspace);
+            self.model.plot3d(pose,'noarrow','workspace',self.workspace);
             if isempty(findobj(get(gca,'Children'),'Type','Light'))
                 camlight
             end  

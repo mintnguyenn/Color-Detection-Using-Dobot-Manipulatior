@@ -7,7 +7,7 @@ clear all
 clc
 hold on 
 
-
+djfnhdnfnhdgffdnjfd
 [frontMatrix,backMatrix,leftMatrix,rightMatrix]=drawLightCurtain(0,1);
 base = transl(0,0,0);
 qDefault = [0,0,0,0,0];

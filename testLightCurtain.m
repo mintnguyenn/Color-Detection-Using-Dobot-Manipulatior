@@ -18,11 +18,13 @@ Trajectory = jtraj(qDefault,q,steps);
 k = -2; 
 
 for i = 1:1:steps
+    delete(vert); 
+    delete(edge);
     Dobot.model.animate(Trajectory(i,:)); 
     centerpnt = [k,0,0.15];
     side = 0.3;
     plotOptions.plotFaces = true;
-    [vertex,faces,faceNormals] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
+    [vertex,faces,faceNormals,vert,edge] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
     resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
     resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
     resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);

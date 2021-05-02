@@ -1,4 +1,4 @@
-function [vertex,face,faceNormals] = RectangularPrism(lower,upper,plotOptions,axis_h)
+function [vertex,face,faceNormals,vert,edge] = RectangularPrism(lower,upper,plotOptions,axis_h)
 if nargin<4
         axis_h=gca;
     if nargin<3
@@ -38,7 +38,7 @@ end
 %% If plot verticies
 if isfield(plotOptions,'plotVerts') && plotOptions.plotVerts
     for i=1:size(vertex,1);
-        plot3(vertex(i,1),vertex(i,2),vertex(i,3),'r*');
+        vert = plot3(vertex(i,1),vertex(i,2),vertex(i,3),'r*');
         text(vertex(i,1),vertex(i,2),vertex(i,3),num2str(i));
     end
 end
@@ -59,7 +59,7 @@ if isfield(plotOptions,'plotEdges') && plotOptions.plotEdges
         8,3];
 
     for i=1:size(links,1)
-        plot3(axis_h,[vertex(links(i,1),1),vertex(links(i,2),1)],...
+        edge = plot3(axis_h,[vertex(links(i,1),1),vertex(links(i,2),1)],...
             [vertex(links(i,1),2),vertex(links(i,2),2)],...
             [vertex(links(i,1),3),vertex(links(i,2),3)],'k')
     end

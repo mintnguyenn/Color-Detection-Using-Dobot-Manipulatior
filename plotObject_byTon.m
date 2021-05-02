@@ -3,7 +3,7 @@ classdef plotObject_byTon < handle
     properties 
     vData; 
     pData; 
-    fData;s
+    fData;
     v1;
     v2;
     v3;

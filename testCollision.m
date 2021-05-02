@@ -14,7 +14,7 @@ close all
 clear all 
 clc 
 
-brick = plotObject(transl(0,0,0.15),troty(pi/2),'Brick.ply');
+brick = plotObject_byTon(transl(0,0,0.15),troty(pi/2),'Brick.ply');
 base = transl(0.25,0.25,0);
 q = [0,0,pi/2,0,0]; 
 qDefault = [0,0,0,0,0];

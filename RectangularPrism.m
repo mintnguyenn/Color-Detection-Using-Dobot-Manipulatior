@@ -1,4 +1,4 @@
-function [vertex,face,faceNormals,vert,edge] = RectangularPrism(lower,upper,plotOptions,axis_h)
+function [vertex,face,faceNormals,facePatch] = RectangularPrism(lower,upper,plotOptions,axis_h)
 if nargin<4
         axis_h=gca;
     if nargin<3
@@ -69,7 +69,7 @@ end
 if isfield(plotOptions,'plotFaces') && plotOptions.plotFaces
     tcolor = [.2 .2 .8];
     
-    patch('Faces',face,'Vertices',vertex,'FaceVertexCData',tcolor,'FaceColor','flat','lineStyle','none');
+    facePatch = patch('Faces',face,'Vertices',vertex,'FaceVertexCData',tcolor,'FaceColor','flat','lineStyle','none');
 end
 
 end

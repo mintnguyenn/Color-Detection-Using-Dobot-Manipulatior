@@ -18,8 +18,6 @@ Trajectory = jtraj(qDefault,q,steps);
 k = -2; 
 
 for i = 1:1:steps
-    delete(vert); 
-    delete(edge);
     Dobot.model.animate(Trajectory(i,:)); 
     centerpnt = [k,0,0.15];
     side = 0.3;
@@ -42,7 +40,8 @@ for i = 1:1:steps
     if resultRight == 1
         break
     end
-   
+%     delete(vert); 
+%     delete(edge);
     pause(0.1)
 end 
 

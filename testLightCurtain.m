@@ -28,7 +28,8 @@ for i = 1:1:steps
     resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
     resultRight = IsCollisionCurtain(rightMatrix,faces,vertex,faceNormals);
     k = k + 0.03;
-    if resultFront == 1
+    stepsDone = i;  % record the steps done to helps the robot keep following the trajectory in the next for loop
+    if resultFront == 1     
         break
     end
     if resultBack == 1
@@ -44,7 +45,27 @@ for i = 1:1:steps
     delete(facePatchTest);
 end 
 
+delete(facePatchTest); %delete the 'forward' cube
+pause(0.5); % delay abit before go 'backward'
 
+if (resultLeft == 1) % can change here to utilize
+    for j = stepsDone:1:steps  %use the stepsDone and steps to keep follow the trajectory
+        Dobot.model.animate(Trajectory(j,:));
+        centerpnt = [k,0,0.15];
+        side = 0.3;
+        plotOptions.plotFaces = true;
+        [vertex,faces,faceNormals,facePatchTest] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
+        resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
+        resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
+        resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
+        resultRight = IsCollisionCurtain(rightMatrix,faces,vertex,faceNormals);
+        k = k - 0.03;
+        
+        pause(0.1)
+        delete(facePatchTest);
+    end
+    
+end
 % resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
 % resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
 % resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);

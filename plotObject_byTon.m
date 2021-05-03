@@ -22,7 +22,7 @@ classdef plotObject_byTon < handle
     
     methods
 %% get the table 
-function self = plotObject(translation,rotation,plyname)
+function self = plotObject_byTon(translation,rotation,plyname)
     self.translation = translation;
     self.rotation = rotation; 
     self.plyname = plyname;

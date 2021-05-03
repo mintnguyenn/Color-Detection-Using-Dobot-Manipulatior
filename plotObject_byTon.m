@@ -49,13 +49,13 @@ function MoveTable(self,trans,rot)
     self.Pose = self.Pose*trans*rot; 
     self.UpdatePoint = [self.Pose * [self.MidVerticiesPoint,ones(self.VertexCount,1)]']' ;  
     self.mesh_h.Vertices = self.UpdatePoint(:,1:3);
-%     self.faceNormals = zeros(size(self.fData,1),3);
-%     for faceIndex = 1:size(self.fData,1)  
-%         self.v1 = self.vData(self.fData(faceIndex,1)',:);
-%         self.v2 = self.vData(self.fData(faceIndex,2)',:);
-%         self.v3 = self.vData(self.fData(faceIndex,3)',:);
-%         self.faceNormals(faceIndex,:) = unit(cross(self.v2-self.v1,self.v3-self.v1));
-%     end
+    self.faceNormals = zeros(size(self.fData,1),3);
+    for faceIndex = 1:size(self.fData,1)  
+        self.v1 = self.vData(self.fData(faceIndex,1)',:);
+        self.v2 = self.vData(self.fData(faceIndex,2)',:);
+        self.v3 = self.vData(self.fData(faceIndex,3)',:);
+        self.faceNormals(faceIndex,:) = unit(cross(self.v2-self.v1,self.v3-self.v1));
+    end
 end
     end
 end

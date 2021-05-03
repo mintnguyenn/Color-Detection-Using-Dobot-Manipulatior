@@ -22,7 +22,7 @@ for i = 1:1:steps
     centerpnt = [k,0,0.15];
     side = 0.3;
     plotOptions.plotFaces = true;
-    [vertex,faces,faceNormals,vert,edge] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
+    [vertex,faces,faceNormals,facePatchTest] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
     resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
     resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
     resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
@@ -40,9 +40,8 @@ for i = 1:1:steps
     if resultRight == 1
         break
     end
-%     delete(vert); 
-%     delete(edge);
     pause(0.1)
+    delete(facePatchTest);
 end 
 
 

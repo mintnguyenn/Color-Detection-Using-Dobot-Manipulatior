@@ -28,8 +28,8 @@ classdef Dobot < handle
             L(1) = Link('d',0.138,   'a',0,     'alpha',-pi/2, 'offset',0,     'qlim',[deg2rad(-135),deg2rad(135)]);
             L(2) = Link('d',0,       'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
             L(3) = Link('d',0,       'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
-            L(4) = Link('d',0,       'a',0.061, 'alpha',pi/2,  'offset',0,     'qlim',[deg2rad(-90) ,deg2rad(90)]);
-%             L(5) = Link('d',-0.0385, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
+            L(4) = Link('d',0,       'a',0.061, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
+            L(5) = Link('d',-0.0385, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
  
             self.model = SerialLink(L,'name',name);
 
@@ -68,5 +68,43 @@ classdef Dobot < handle
                 end
             end
         end
+        %% Line Plane Intersection
+        function [intersectionPoint,check] = LinePlaneIntersection(planeNormal,pointOnPlane,point1OnLine,point2OnLine)
+
+            intersectionPoint = [0 0 0];
+            u = point2OnLine - point1OnLine;
+            w = point1OnLine - pointOnPlane;
+            D = dot(planeNormal,u);
+            N = -dot(planeNormal,w);
+            check = 0; %#ok<NASGU>
+            if abs(D) < 10^-7        % The segment is parallel to plane
+                if N == 0           % The segment lies in plane
+                    check = 2;
+                    return
+                else
+                    check = 0;       %no intersection
+                    return
+                end
+            end
+
+%compute the intersection parameter
+            sI = N / D;
+            intersectionPoint = point1OnLine + sI.*u;
+
+            if (sI < 0 || sI > 1)
+                check= 3;          %The intersection point  lies outside the segment, so there is no intersection
+            else
+                check=1;
+            end
+        end
+        %%
+        function qMatrixNew = ChangeQMatrix(qMatrix)
+            qMatrixNew = zeros(50, 5);
+            for i = 1:50
+                qMatrixNew(i,1:3) = qMatrix(i,1:3);
+                qMatrixNew(i,4) = pi - qMatrix(i,2) - qMatrix(i,3);
+            end         
+        end
+        
     end
 end

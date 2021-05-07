@@ -1,5 +1,8 @@
+%% Setup
 clear; clc; clf;
+rosshutdown();
 
+rosinit();
 
 q = [0 1.13 1.84 0];
 qHome = [0 q(2) q(3) (pi)-q(2)-q(3) q(4)];
@@ -8,32 +11,32 @@ base = eye(4);
 robot = Dobot(base, qHome);
 hold on
 
-R = [0.25  0   0.001];
-G = [0.25  0.1 0.001];
-B = [0.25 -0.1 0.001];
+R1 = [0.25  0   0.001];
+G1 = [0.25  0.1 0.001];
+B1 = [0.25 -0.1 0.001];
 
 R2 = [0.2  0   0.001];
 G2 = [0.2  0.1 0.001];
 B2 = [0.2 -0.1 0.001];
 
-tokenRed   = PlotObject('tokenred.ply'  , R);
-tokenGreen = PlotObject('tokengreen.ply', G);
-tokenBlue  = PlotObject('tokenblue.ply' , B);
+tokenRed1   = PlotObject('tokenred.ply'  , R1);
+tokenGreen1 = PlotObject('tokengreen.ply', G1);
+tokenBlue1  = PlotObject('tokenblue.ply' , B1);
 
 tokenRed2   = PlotObject('tokenred.ply'  , R2);
 tokenGreen2 = PlotObject('tokengreen.ply', G2);
 tokenBlue2  = PlotObject('tokenblue.ply' , B2);
 
 %%
-destinationRed   = [0.05 0.2 0];
-destinationGreen  = [0.10 0.2 0];
-destinationBlue = [0.15 0.2 0];
+destinationRed   = [0.05 0.2 0.001];
+destinationGreen = [0.10 0.2 0.001];
+destinationBlue  = [0.15 0.2 0.001];
 
 rotation = rpy2r(0, 0, 0);
 
 %% Pick Red
 input("");
-qPrepare1 = robot.model.ikcon(rt2tr(rotation, R'+[0; 0; 0.05]), qHome);
+qPrepare1 = robot.model.ikcon(rt2tr(rotation, R1'+[0; 0; 0.05]), qHome);
 qMatrix1 = jtraj(qHome, qPrepare1, 50);
 
 for i = 1:50
@@ -47,7 +50,7 @@ for i = 1:50
     pause(0.01);
 end
 
-qPick = robot.model.ikcon(rt2tr(rotation, R'), qPrepare1);
+qPick = robot.model.ikcon(rt2tr(rotation, R1'), qPrepare1);
 qMatrix2 = jtraj(qPrepare1, qPick, 50);
 for i = 1:50
     qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
@@ -69,7 +72,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenRed.Move(robot.model.fkine(qTraj));
+    tokenRed1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -83,7 +86,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenRed.Move(robot.model.fkine(qTraj));
+    tokenRed1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -97,7 +100,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenRed.Move(robot.model.fkine(qTraj));
+    tokenRed1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -126,7 +129,7 @@ for i = 1:50
 end
 
 %% Pick Green
-qPrepare1 = robot.model.ikcon(rt2tr(rotation, G'+[0; 0; 0.05]), qHome);
+qPrepare1 = robot.model.ikcon(rt2tr(rotation, G1'+[0; 0; 0.05]), qHome);
 qMatrix1 = jtraj(qHome, qPrepare1, 50);
 for i = 1:50
     qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
@@ -139,7 +142,7 @@ for i = 1:50
     pause(0.01);
 end
 
-qPick = robot.model.ikcon(rt2tr(rotation, G'), qPrepare1);
+qPick = robot.model.ikcon(rt2tr(rotation, G1'), qPrepare1);
 qMatrix2 = jtraj(qPrepare1, qPick, 50);
 for i = 1:50
     qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
@@ -161,7 +164,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenGreen.Move(robot.model.fkine(qTraj));
+    tokenGreen1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -175,11 +178,11 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenGreen.Move(robot.model.fkine(qTraj));
+    tokenGreen1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
-qPlace = robot.model.ikcon(rt2tr(rotation, destinationGreen'+[0;0;0.001]), qPrepare2);
+qPlace = robot.model.ikcon(rt2tr(rotation, destinationGreen'), qPrepare2);
 qMatrix5 = jtraj(qPrepare2, qPlace, 50);
 for i = 1:50
     qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
@@ -189,7 +192,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenGreen.Move(robot.model.fkine(qTraj));
+    tokenGreen1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -218,7 +221,7 @@ for i = 1:50
 end
 
 %% Pick Blue
-qPrepare1 = robot.model.ikcon(rt2tr(rotation, B'+[0; 0; 0.05]), qHome);
+qPrepare1 = robot.model.ikcon(rt2tr(rotation, B1'+[0; 0; 0.05]), qHome);
 qMatrix1 = jtraj(qHome, qPrepare1, 50);
 for i = 1:50
     qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
@@ -231,7 +234,7 @@ for i = 1:50
     pause(0.01);
 end
 
-qPick = robot.model.ikcon(rt2tr(rotation, B'), qPrepare1);
+qPick = robot.model.ikcon(rt2tr(rotation, B1'), qPrepare1);
 qMatrix2 = jtraj(qPrepare1, qPick, 50);
 for i = 1:50
     qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
@@ -253,7 +256,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenBlue.Move(robot.model.fkine(qTraj));
+    tokenBlue1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
@@ -267,11 +270,11 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenBlue.Move(robot.model.fkine(qTraj));
+    tokenBlue1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 
-qPlace = robot.model.ikcon(rt2tr(rotation, destinationBlue'+[0;0;0.001]), qPrepare2);
+qPlace = robot.model.ikcon(rt2tr(rotation, destinationBlue'), qPrepare2);
 qMatrix5 = jtraj(qPrepare2, qPlace, 50);
 for i = 1:50
     qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
@@ -281,7 +284,7 @@ for i = 1:50
     robot.model.animate(qTraj);
     drawnow();
     
-    tokenBlue.Move(robot.model.fkine(qTraj));
+    tokenBlue1.Move(robot.model.fkine(qTraj));
 %     pause(0.01);
 end
 

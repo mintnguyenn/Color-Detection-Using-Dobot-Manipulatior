@@ -68,6 +68,7 @@ classdef Dobot < handle
                 end
             end
         end
+        
         %% Line Plane Intersection
         function [intersectionPoint,check] = LinePlaneIntersection(planeNormal,pointOnPlane,point1OnLine,point2OnLine)
 
@@ -97,13 +98,32 @@ classdef Dobot < handle
                 check=1;
             end
         end
-        %%
-        function qMatrixNew = ChangeQMatrix(qMatrix)
-            qMatrixNew = zeros(50, 5);
-            for i = 1:50
-                qMatrixNew(i,1:3) = qMatrix(i,1:3);
-                qMatrixNew(i,4) = pi - qMatrix(i,2) - qMatrix(i,3);
-            end         
+        
+        %% Set Initialise Dobot
+        function SetInitialiseDobot(self)
+            [safetyStatePublisher,safetyStateMsg] = rospublisher('/dobot_magician/target_safety_status');
+            safetyStateMsg.Data = 2;
+            send(safetyStatePublisher,safetyStateMsg);
+        end
+        
+        %% Move Real Dobot
+        function MoveRealDobot(position)
+            endEffectorPosition = position;
+            endEffectorRotation = [0,0,0];
+
+            [targetEndEffectorPub,targetEndEffectorMsg] = rospublisher('/dobot_magician/target_end_effector_pose');
+
+            targetEndEffectorMsg.Position.X = endEffectorPosition(1);
+            targetEndEffectorMsg.Position.Y = endEffectorPosition(2);
+            targetEndEffectorMsg.Position.Z = endEffectorPosition(3);
+
+            qua = eul2quat(endEffectorRotation);
+            targetEndEffectorMsg.Orientation.W = qua(1);
+            targetEndEffectorMsg.Orientation.X = qua(2);
+            targetEndEffectorMsg.Orientation.Y = qua(3);
+            targetEndEffectorMsg.Orientation.Z = qua(4);
+
+            send(targetEndEffectorPub,targetEndEffectorMsg);
         end
         
     end

@@ -29,7 +29,7 @@ classdef Dobot < handle
             L(2) = Link('d',0,       'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
             L(3) = Link('d',0,       'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
             L(4) = Link('d',0,       'a',0.061, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
-            L(5) = Link('d',-0.0385, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
+            L(5) = Link('d',-0.077, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
  
             self.model = SerialLink(L,'name',name);
 
@@ -107,24 +107,22 @@ classdef Dobot < handle
         end
         
         %% Move Real Dobot
-        function MoveRealDobot(position)
-            endEffectorPosition = position;
-            endEffectorRotation = [0,0,0];
+        function MoveRealDobot(self, qReal)
+            jointTarget = qReal; % Remember that the Dobot has 4 joints by default.
 
-            [targetEndEffectorPub,targetEndEffectorMsg] = rospublisher('/dobot_magician/target_end_effector_pose');
+            [targetJointTrajPub,targetJointTrajMsg] = rospublisher('/dobot_magician/target_joint_states');
+            trajectoryPoint = rosmessage("trajectory_msgs/JointTrajectoryPoint");
+            trajectoryPoint.Positions = jointTarget;
+            targetJointTrajMsg.Points = trajectoryPoint;
 
-            targetEndEffectorMsg.Position.X = endEffectorPosition(1);
-            targetEndEffectorMsg.Position.Y = endEffectorPosition(2);
-            targetEndEffectorMsg.Position.Z = endEffectorPosition(3);
-
-            qua = eul2quat(endEffectorRotation);
-            targetEndEffectorMsg.Orientation.W = qua(1);
-            targetEndEffectorMsg.Orientation.X = qua(2);
-            targetEndEffectorMsg.Orientation.Y = qua(3);
-            targetEndEffectorMsg.Orientation.Z = qua(4);
-
-            send(targetEndEffectorPub,targetEndEffectorMsg);
+            send(targetJointTrajPub,targetJointTrajMsg);
         end
         
+        %% Set Gripper
+        function SetGripper(state)
+            [toolStatePub, toolStateMsg] = rospublisher('/dobot_magician/target_tool_state');
+            toolStateMsg.Data = state; 
+            send(toolStatePub,toolStateMsg);
+        end
     end
 end

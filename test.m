@@ -29,3 +29,29 @@ while i
     end
     A.STOPButtonPushed(i);
 end
+%%
+clear; clc;
+
+qHomeReal  = [0 0.7862 0.7844 0];
+qReal = qHomeReal;
+qHomeModel = [qHomeReal(1) qHomeReal(2) (pi/2)-qHomeReal(2)+qHomeReal(3) (pi/2)-qHomeReal(3) qHomeReal(4)];
+base = eye(4);
+
+robot = Dobot2(base, qHomeModel);
+
+% robot.MoveRealDobot(qHomeReal);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -35,11 +35,11 @@ classdef Dobot2 < handle
             name = ['Dobot',datestr(now,'yyyymmddTHHMMSSFFF')];
 
             % Create the UR3 model mounted on a linear rail
-            L(1) = Link('d',0,       'a',0,     'alpha',-pi/2, 'offset',0,     'qlim',[deg2rad(-135),deg2rad(135)]);
-            L(2) = Link('d',0,       'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
-            L(3) = Link('d',0,       'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
-            L(4) = Link('d',0,       'a',0.061, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
-            L(5) = Link('d',-0.077, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
+            L(1) = Link('d',0,     'a',0,     'alpha',-pi/2, 'offset',0,     'qlim',[deg2rad(-135),deg2rad(135)]);
+            L(2) = Link('d',0,     'a',0.135, 'alpha',0,     'offset',-pi/2, 'qlim',[deg2rad(5)   ,deg2rad(80)]);
+            L(3) = Link('d',0,     'a',0.147, 'alpha',0,     'offset',0,     'qlim',[deg2rad(15)  ,deg2rad(170)]);
+            L(4) = Link('d',0,     'a',0.061, 'alpha',pi/2,  'offset',-pi/2, 'qlim',[deg2rad(-90) ,deg2rad(90)]);
+            L(5) = Link('d',-0.07, 'a',0,     'alpha',0,     'offset',0,     'qlim',[deg2rad(-85) ,deg2rad(85)]);
  
             self.model = SerialLink(L,'name',name);
 
@@ -117,22 +117,26 @@ classdef Dobot2 < handle
         end
         
         %% Move Real Dobot
-        function MoveRealDobot(self, qReal)
-            jointTarget = qReal; % Remember that the Dobot has 4 joints by default.
+        function MoveRealDobot(self, qReal, usingRealRobot)
+            if usingRealRobot
+                jointTarget = qReal; % Remember that the Dobot has 4 joints by default.
 
-            [self.targetJointTrajPub,self.targetJointTrajMsg] = rospublisher('/dobot_magician/target_joint_states');
-            self.trajectoryPoint = rosmessage("trajectory_msgs/JointTrajectoryPoint");
-            self.trajectoryPoint.Positions = jointTarget;
-            self.targetJointTrajMsg.Points = self.trajectoryPoint;
+                [self.targetJointTrajPub,self.targetJointTrajMsg] = rospublisher('/dobot_magician/target_joint_states');
+                self.trajectoryPoint = rosmessage("trajectory_msgs/JointTrajectoryPoint");
+                self.trajectoryPoint.Positions = jointTarget;
+                self.targetJointTrajMsg.Points = self.trajectoryPoint;
 
-            send(self.targetJointTrajPub,self.targetJointTrajMsg);
+                send(self.targetJointTrajPub,self.targetJointTrajMsg);
+            end
         end
         
         %% Set Gripper
-        function SetGripper(self, state)
-            [self.toolStatePub, self.toolStateMsg] = rospublisher('/dobot_magician/target_tool_state');
-            self.toolStateMsg.Data = [state]; % Send 1 for on and 0 for off 
-            send(self.toolStatePub,self.toolStateMsg);
+        function SetGripper(self, state, usingRealRobot)
+            if usingRealRobot
+                [self.toolStatePub, self.toolStateMsg] = rospublisher('/dobot_magician/target_tool_state');
+                self.toolStateMsg.Data = [state]; % Send 1 for on and 0 for off 
+                send(self.toolStatePub,self.toolStateMsg);
+            end
         end
     end
 end

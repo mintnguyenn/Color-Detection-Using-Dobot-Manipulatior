@@ -3,6 +3,8 @@ clear; clc; clf;
 % rosshutdown();
 % rosinit();
 
+% GUI = DobotGUI();
+
 usingRealRobot = true;
 
 qHomeReal  = [0 0.7862 0.7844 0];
@@ -18,9 +20,9 @@ locationRed1   = [0.181  0   z];
 locationGreen1 = [0.181  0.1 z];
 locationBlue1  = [0.181 -0.1 z];
 
-locationRed2   = [0.292  0   z];
-locationGreen2 = [0.292  0.1 z];
-locationBlue2  = [0.292 -0.1 z];
+locationRed2   = [0.291  0   z];
+locationGreen2 = [0.291  0.1 z];
+locationBlue2  = [0.291 -0.1 z];
 
 destinationRed   = [0.05 0.25 z];
 destinationGreen = [0.10 0.25 z];
@@ -37,6 +39,9 @@ tokenGreen2 = PlotObject('tokengreen.ply', locationGreen2);
 tokenBlue2  = PlotObject('tokenblue.ply' , locationBlue2);
 
 robot.MoveRealDobot(qHomeReal, usingRealRobot);
+%%
+% GUI.Joint1SliderValueChanging(qHome(1));
+
 %% Pick Red
 input("Press Enter to Start");
 

@@ -715,6 +715,7 @@ classdef TokenSorterDobot < handle
 
 %% Color detection
         function [location] = ColorDetection(self)
+            location = zeros(6,3);
             A = rossubscriber('/camera/color/image_raw');
             RGB = readImage(A.LatestMessage);
             I = rgb2hsv(RGB);
@@ -731,7 +732,7 @@ classdef TokenSorterDobot < handle
             (I(:,:,2) >= redChannel2Min ) & (I(:,:,2) <= redChannel2Max) & ...
             (I(:,:,3) >= redChannel3Min ) & (I(:,:,3) <= redChannel3Max);
         
-            [B1, L1, n1, A1] = bwboundaries(BWRed,'noholes');
+            BRed = bwboundaries(BWRed,'noholes');
             
             % Green color threshoder
             greenChannel1Min = 0.323;
@@ -745,11 +746,28 @@ classdef TokenSorterDobot < handle
             (I(:,:,2) >= greenChannel2Min ) & (I(:,:,2) <= greenChannel2Max) & ...
             (I(:,:,3) >= greenChannel3Min ) & (I(:,:,3) <= greenChannel3Max);
         
-            [B2, L2, n2, A2] = bwboundaries(BWGreen,'noholes');
+            BGreen = bwboundaries(BWGreen,'noholes');
             
             % Blue color thresholder
             
             % 
+            BRed   = NoiseFilter(BRed);
+            BGreen = NoiseFilter(BGreen);
+            
+            xRed1   = BRed{1,1}(:,2);
+            yRed1   = BRed{1,1}(:,1);
+            xRed2   = BRed{2,1}(:,2);
+            yRed2   = BRed{2,1}(:,1);
+            
+            xGreen1 = BGreen{1,1}(:,2);
+            yGreen1 = BGreen{1,1}(:,1);
+            xGreen2 = BGreen{2,1}(:,2);
+            yGreen2 = BGreen{2,1}(:,1);
+            
+            [xRed1Center, yRed1Center] = Circlefit(xRed1, yRed1);
+            [xRed2Center, yRed2Center] = Circlefit(xRed2, yRed2);
+            [xGreen1Center, yGreen1Center] = Circlefit(xGreen1, yGreen1);
+            [xGreen2Center, yGreen2Center] = Circlefit(xGreen2, yGreen2);
             
         end
 

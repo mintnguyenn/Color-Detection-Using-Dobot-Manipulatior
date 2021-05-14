@@ -1,11 +1,15 @@
- clc;
+clc;
 
-% A = rossubscriber('/camera/color/image_raw');
-% pause(1);
-% RGB = readImage(A.LatestMessage);
-% imshow(I)
+if false
+A = rossubscriber('/camera/color/image_raw');
+pause(1);
+RGB = readImage(A.LatestMessage);
+end
+
 RGB = imread('test.png');
 I = rgb2hsv(RGB);
+
+% Green
 % Define thresholds for channel 1 based on histogram settings
 greenChannel1Min = 0.323;
 greenChannel1Max = 0.546;
@@ -23,9 +27,9 @@ greenSliderBW = (I(:,:,1) >= greenChannel1Min ) & (I(:,:,1) <= greenChannel1Max)
     (I(:,:,3) >= greenChannel3Min ) & (I(:,:,3) <= greenChannel3Max);
 BWGreen = greenSliderBW;
 
-[B1, L1, n1, A1] = bwboundaries(BWGreen,'noholes');
+BGreen = bwboundaries(BWGreen,'noholes');
 
-%% Red
+% Red
 % Define thresholds for channel 1 based on histogram settings
 redChannel1Min = 0.909;
 redChannel1Max = 0.126;
@@ -44,36 +48,28 @@ redSliderBW = ( (I(:,:,1) >= redChannel1Min) | (I(:,:,1) <= redChannel1Max) ) & 
     (I(:,:,3) >= redChannel3Min ) & (I(:,:,3) <= redChannel3Max);
 BWRed = redSliderBW;
 
-[B2, L2, n2, A2] = bwboundaries(BWRed,'noholes');
+BRed = bwboundaries(BWRed,'noholes');
 %%
-
-BGreen = cell2mat(B1);
-x = BGreen(:,2)';
-% x = linspace(0,1080);
-y = BGreen(:,1)';
-
-plot(x,y,'g');
-axis([0 1920 0 1080]);
-
-hold on;
-% BRed1 = cell2mat(B2{1,1});
-% u = BRed1(:,2)';
-% v = BRed1(:,1)';
-
-u1 = B2{1,1}(:,2);
-v1 = B2{1,1}(:,1);
-
-plot(u1,v1,'r'); hold on;
-
-u2 = B2{4,1}(:,2);
-v2 = B2{4,1}(:,1);
-
-plot(u2,v2,'r'); hold on;
-
-u3 = B2{5,1}(:,2);
-v3 = B2{5,1}(:,1);
-
-plot(u3,v3,'r');
-% u = [u1; u2; u3];
-% v = [v1; v2; v3];
-% plot(u,v);
+            BRed   = NoiseFilter(BRed);
+            BGreen = NoiseFilter(BGreen);
+            
+            xRed1   = BRed{1,1}(:,2);
+            yRed1   = BRed{1,1}(:,1);
+            plot(xRed1, yRed1,'r');
+            hold on;
+            axis([0 1920 0 1080]);
+            
+            xRed2   = BRed{2,1}(:,2);
+            yRed2   = BRed{2,1}(:,1);
+            plot(xRed2, yRed2,'r');
+            
+            xGreen1 = BGreen{1,1}(:,2);
+            yGreen1 = BGreen{1,1}(:,1);
+            plot(xGreen1, yGreen1,'g');
+%             xGreen2 = BGreen{2,1}(:,2);
+%             yGreen2 = BGreen{2,1}(:,1);
+            
+            [xRed1Center, yRed1Center] = Circlefit(xRed1, yRed1); plot(xRed1Center, yRed1Center,'*');
+            [xRed2Center, yRed2Center] = Circlefit(xRed2, yRed2); plot(xRed2Center, yRed2Center,'*');
+            [xGreen1Center, yGreen1Center] = Circlefit(xGreen1, yGreen1); plot(xGreen1Center, yGreen1Center,'*');
+%             [xGreen2Center, yGreen2Center] = Circlefit(xGreen2, yGreen2);

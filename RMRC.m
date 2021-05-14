@@ -1,7 +1,12 @@
 % Base on Lab 9 Exercise Solution
-% Input x, y and height z1, z2 to use RMRC go up and down
-% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0(y), z1 = 0.1 and z2 = 0.3 <<<<<<<
-% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0.2(z), y1 = -0.1 and y2 = 0.1 <<<<<<<
+% Input x, y and height z1, z2 to use RMRC go up and down + parallel with
+% the ground
+% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0(y), z1 = 0.1 and z2 = 0.3  + 0<<<<<<<
+% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0.2(z), y1 = -0.1 and y2 = 0.1 + 1<<<<<<<
+
+% CAUTION: MODE == 0 mean vertically move
+% And other will be horizontal
+% Might wanna have curve :P
 function [] = RMRC(fixInput1, fixInput2, lengthInput1, lengthInput2, mode)
 % Init setup - Might wanna get rid this
 qHomeReal  = [0 0.7862 0.7844 0];
@@ -30,7 +35,7 @@ positionError = zeros(3,steps); % For plotting trajectory error
 angleError = zeros(3,steps);    % For plotting trajectory error
 
 % Trajectory
-if mode == 0
+if mode == 0 %% GO UP DOWN/Vertically
     s = lspb(lengthInput1, lengthInput2, steps);        % Trapezoidal trajectory scalar
     for i=1:steps
         x(1,i) = fixInput1;            % Points in x
@@ -40,7 +45,7 @@ if mode == 0
         theta(2,i) = 0;             % Pitch angle
         theta(3,i) = 1;             % Yaw angle
     end
-else
+else %% GO HORIZONTALLY
     s = lspb(lengthInput1, lengthInput2, steps);        % Trapezoidal trajectory scalar
     for i=1:steps
         x(1,i) = fixInput1;            % Points in x

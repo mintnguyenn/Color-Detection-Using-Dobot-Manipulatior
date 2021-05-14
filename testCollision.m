@@ -16,9 +16,10 @@ clc
 
 % brick = plotObject_byTon(transl(0,0,0.15),troty(pi/2),'Brick.ply');
 base = transl(0.25,0.25,0);
-q = [0,0,pi/2,0,0]; 
-qDefault = [0,0,0,0,0];
-q1 = [pi/2,0,pi/2,0,0];
+q_pickup = [0,0,pi/2,0,0];
+q = [0,0,pi/3,0,0]; 
+q1 = [pi/2,0,pi/3,0,0];
+q_putdown = [pi/2,0,pi/2,0,0];
 steps = 50; 
 
 Dobot = Dobot(base,q);
@@ -29,9 +30,10 @@ side = 0.3;
 plotOptions.plotFaces = true;
 [vertex,faces,faceNormals] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
 
-Trajectory = jtraj(q,q1,steps);
-trajectoryDefault_No1 = jtraj(q,qDefault,steps);
-trajectoryDefault_No2 = jtraj(qDefault,q1,steps);
+Trajectory = jtraj(q_pickup,q_putdown,steps);
+trajectoryDefault_No1 = jtraj(q_pickup,q,steps);
+trajectoryDefault_No2 = jtraj(q,q1,steps);
+trajectoryDefault_No3 = jtraj(q1,q_putdown,steps);
 
 % Collision prediction 
 for i = 1:1:steps
@@ -50,18 +52,22 @@ end
     disp(['The Dobot switchs to alternative movements']);
     for i = 1:1:steps
         Dobot.model.animate(trajectoryDefault_No1(i,:));  
-        pause(0.01);
+        pause(0.1);
     end
     for i = 1:1:steps
         Dobot.model.animate(trajectoryDefault_No2(i,:));  
-        pause(0.01);
+        pause(0.1);
+    end
+    for k = 1:1:steps
+        Dobot.model.animate(trajectoryDefault_No3(k,:));  
+        pause(0.1);
     end
  end
  
   if Collide == 0
     for i = 1:1:steps
         Dobot.model.animate(Trajectory(i,:));  
-        pause(0.01);
+        pause(0.5);
     end
  end
 
@@ -80,7 +86,11 @@ end
 %             Dobot.model.animate(trajectoryDefault_No2(k,:));  
 %             pause(0.1);
 %         end
-%         break 
+%         for k = 1:1:steps
+%             Dobot.model.animate(trajectoryDefault_No3(k,:));  
+%             pause(0.1);
+%         end
+
  
 %% RMRC
 % function qMatrix = GenerateRMRC(robot,pose,steps,deltaT,epsilon)

@@ -1,7 +1,8 @@
-% Writen by Son base on Lab 9 Exercise
+% Base on Lab 9 Exercise Solution
 % Input x, y and height z1, z2 to use RMRC go up and down
-% >>>>>>> can test with x = 0.26, y = 0, z1 = 0.1 and z2 = 0.3 <<<<<<<
-function [] = RMRC(xInput, yInput, zInput1, zInput2)
+% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0(y), z1 = 0.1 and z2 = 0.3 <<<<<<<
+% >>>>>>> can test with fix1 = 0.26(x), fix2 = 0.2(z), y1 = -0.1 and y2 = 0.1 <<<<<<<
+function [] = RMRC(fixInput1, fixInput2, lengthInput1, lengthInput2, mode)
 % Init setup - Might wanna get rid this
 qHomeReal  = [0 0.7862 0.7844 0];
 qHomeModel = [qHomeReal(1) qHomeReal(2) (pi/2)-qHomeReal(2)+qHomeReal(3) (pi/2)-qHomeReal(3) qHomeReal(4)];
@@ -29,15 +30,28 @@ positionError = zeros(3,steps); % For plotting trajectory error
 angleError = zeros(3,steps);    % For plotting trajectory error
 
 % Trajectory
-s = lspb(zInput1, zInput2, steps);        % Trapezoidal trajectory scalar
-for i=1:steps
-    x(1,i) = xInput;            % Points in x
-    x(2,i) = yInput;            % Points in y / no change if wanna go in straight line
-    x(3,i) = s(i);              % Points in z
-    theta(1,i) = 0;             % Roll angle
-    theta(2,i) = 0;             % Pitch angle
-    theta(3,i) = 1;             % Yaw angle
+if mode == 0
+    s = lspb(lengthInput1, lengthInput2, steps);        % Trapezoidal trajectory scalar
+    for i=1:steps
+        x(1,i) = fixInput1;            % Points in x
+        x(2,i) = fixInput2;            % Points in y / no change if wanna go in straight line
+        x(3,i) = s(i);              % Points in z
+        theta(1,i) = 0;             % Roll angle
+        theta(2,i) = 0;             % Pitch angle
+        theta(3,i) = 1;             % Yaw angle
+    end
+else
+    s = lspb(lengthInput1, lengthInput2, steps);        % Trapezoidal trajectory scalar
+    for i=1:steps
+        x(1,i) = fixInput1;            % Points in x
+        x(2,i) = s(i);            % Points in y / no change if wanna go in straight line
+        x(3,i) = fixInput2;              % Points in z
+        theta(1,i) = 0;             % Roll angle
+        theta(2,i) = 0;             % Pitch angle
+        theta(3,i) = 1;             % Yaw angle
+    end
 end
+
 
 T = [rpy2r(theta(1,1),theta(2,1),theta(3,1)) x(:,1);zeros(1,3) 1];          % Create transformation of first point and angle
 q0 = zeros(1,5);                                                            % Initial guess for joint angles

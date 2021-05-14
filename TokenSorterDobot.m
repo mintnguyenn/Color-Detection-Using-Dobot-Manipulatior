@@ -1,12 +1,11 @@
 classdef TokenSorterDobot < handle
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
-    
     properties
         usingRealRobot;
+        eStopState = false;
         
         base;
         qHome;
+        qTeach = [0 0.7862 1.5690 0.7864 0];
         qHomeReal = [0 0.7862 0.7844 0];
         robot;
         
@@ -54,29 +53,30 @@ classdef TokenSorterDobot < handle
 %%
         function PickAndPlace(self, usingRealRobot)
             self.usingRealRobot = usingRealRobot;
-            if self.usingRealRobot
+            if self.usingRealRobot  
                 rosshutdown();
                 rosinit();
             end
             
             self.robot.MoveRealDobot(self.qHomeReal, self.usingRealRobot);
+            self.robot.model.animate(self.qHome);
             
-            input("Press Enter to Start");
+%             input("Press Enter to Start");
             
             rotation = rpy2r(0, 0, 0);
             
- % Pick Red 1         
+ % Pick Red 1
             qPrepare1 = self.robot.model.ikcon(rt2tr(rotation, self.locationRed1'+[0; 0; 0.05]), self.qHome);
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
-    
-                
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -84,14 +84,15 @@ classdef TokenSorterDobot < handle
 
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationRed1'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
-            
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -100,6 +101,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -108,6 +110,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -116,6 +119,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationRed'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -124,6 +128,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -132,6 +137,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationRed'), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -140,6 +146,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -149,12 +156,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -162,12 +171,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -178,12 +189,14 @@ classdef TokenSorterDobot < handle
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
 
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -192,12 +205,14 @@ classdef TokenSorterDobot < handle
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationRed2'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -206,6 +221,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -214,6 +230,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -222,6 +239,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationRed'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -230,6 +248,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -238,6 +257,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationRed'+[0;0;0.0023]), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -246,21 +266,24 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenRed2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
             self.robot.MoveRealDobot(qReal, self.usingRealRobot);
             pause(0.6);
-            self.robot.SetGripper(0, self.usingRealRobot);
+            self.robot.SetGripper(0,   self.usingRealRobot);
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -268,12 +291,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -283,12 +308,14 @@ classdef TokenSorterDobot < handle
             qPrepare1 = self.robot.model.ikcon(rt2tr(rotation, self.locationGreen1'+[0; 0; 0.05]), self.qHome);
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow(); 
+                drawnow();
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -297,12 +324,14 @@ classdef TokenSorterDobot < handle
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationGreen1'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow();  
+                drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -311,6 +340,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -319,6 +349,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -327,6 +358,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationGreen'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -335,6 +367,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -344,6 +377,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationGreen'), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -352,6 +386,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -361,12 +396,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -374,12 +411,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow();  
+                drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -390,12 +429,14 @@ classdef TokenSorterDobot < handle
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
 
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -404,12 +445,14 @@ classdef TokenSorterDobot < handle
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationGreen2'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -418,6 +461,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -426,6 +470,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -434,6 +479,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationGreen'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -442,6 +488,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -450,6 +497,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationGreen'+[0;0;0.0023]), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -458,6 +506,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenGreen2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -467,12 +516,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -480,12 +531,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow(); 
+                drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -495,12 +548,14 @@ classdef TokenSorterDobot < handle
             qPrepare1 = self.robot.model.ikcon(rt2tr(rotation, self.locationBlue1'+[0; 0; 0.05]), self.qHome);
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -509,12 +564,14 @@ classdef TokenSorterDobot < handle
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationBlue1'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow(); 
+                drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -523,6 +580,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -531,6 +589,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -539,6 +598,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationBlue'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -547,6 +607,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -555,6 +616,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationBlue'), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -563,6 +625,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue1.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -572,12 +635,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow();  
+                drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -585,12 +650,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -599,14 +666,15 @@ classdef TokenSorterDobot < handle
 % Pick Blue 2
             qPrepare1 = self.robot.model.ikcon(rt2tr(rotation, self.locationBlue2'+[0; 0; 0.05]), self.qHome);
             qMatrix1 = jtraj(self.qHome, qPrepare1, 50);
-
             for i = 1:50
+                if ~self.eStopState
                 qMatrix1(i,4) = pi - qMatrix1(i,2) - qMatrix1(i,3);
                 qMatrix1(i,5) = 0;
     
                 qTraj = qMatrix1(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow(); 
+                drawnow();
+                end
             end
             qReal = qMatrix1(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -615,12 +683,14 @@ classdef TokenSorterDobot < handle
             qPick = self.robot.model.ikcon(rt2tr(rotation, self.locationBlue2'), qPrepare1);
             qMatrix2 = jtraj(qPrepare1, qPick, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix2(i,4) = pi - qMatrix2(i,2) - qMatrix2(i,3);
                 qMatrix2(i,5) = 0;
     
                 qTraj = qMatrix2(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix2(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -629,6 +699,7 @@ classdef TokenSorterDobot < handle
 
             qMatrix3 = jtraj(qPick, qPrepare1, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix3(i,4) = pi - qMatrix3(i,2) - qMatrix3(i,3);
                 qMatrix3(i,5) = 0;
     
@@ -637,6 +708,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix3(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -645,6 +717,7 @@ classdef TokenSorterDobot < handle
             qPrepare2 = self.robot.model.ikcon(rt2tr(rotation, self.destinationBlue'+[0;0;0.05]), qPrepare1);
             qMatrix4 = jtraj(qPrepare1, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix4(i,4) = pi - qMatrix4(i,2) - qMatrix4(i,3);
                 qMatrix4(i,5) = 0;
     
@@ -653,6 +726,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix4(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -661,6 +735,7 @@ classdef TokenSorterDobot < handle
             qPlace = self.robot.model.ikcon(rt2tr(rotation, self.destinationBlue'+[0;0;0.0023]), qPrepare2);
             qMatrix5 = jtraj(qPrepare2, qPlace, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix5(i,4) = pi - qMatrix5(i,2) - qMatrix5(i,3);
                 qMatrix5(i,5) = 0;
     
@@ -669,6 +744,7 @@ classdef TokenSorterDobot < handle
                 drawnow();
     
                 self.tokenBlue2.Move(self.robot.model.fkine(qTraj));
+                end
             end
             qReal = qMatrix5(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -678,12 +754,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix6 = jtraj(qPlace, qPrepare2, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix6(i,4) = pi - qMatrix6(i,2) - qMatrix6(i,3);
                 qMatrix6(i,5) = 0;
     
                 qTraj = qMatrix6(i,:);
                 self.robot.model.animate(qTraj);
-                drawnow();  
+                drawnow();
+                end
             end
             qReal = qMatrix6(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];
@@ -691,12 +769,14 @@ classdef TokenSorterDobot < handle
 
             qMatrix7 = jtraj(qPrepare2, self.qHome, 50);
             for i = 1:50
+                if ~self.eStopState
                 qMatrix7(i,4) = pi - qMatrix7(i,2) - qMatrix7(i,3);
                 qMatrix7(i,5) = 0;
     
                 qTraj = qMatrix7(i,:);
                 self.robot.model.animate(qTraj);
                 drawnow();
+                end
             end
             qReal = qMatrix7(end,:);
             qReal = [qReal(1) qReal(2) qReal(3) - pi/2 + qReal(2) qReal(5)];

@@ -7,16 +7,12 @@ clear all
 clc
 hold on 
 
-frontPeri = 0;
-backPeri = 0; 
-leftPeri = 0;
-rightPeri = 0;
-
 [frontMatrix,backMatrix,leftMatrix,rightMatrix]=drawLightCurtain(0,1);
 base = transl(0,0,0);
 qDefault = [0,0,pi/2,0,0];
 q = [pi/2,0,pi/2,0,0]; 
 Dobot = Dobot(base,qDefault);
+side = 0.3;
 
 steps = 50;
 Trajectory = jtraj(qDefault,q,steps);
@@ -26,72 +22,39 @@ for i = 1:1:steps
     Dobot.model.animate(Trajectory(i,:)); 
     stepDone = i; 
     centerpnt = [k,0,0.15];
-    side = 0.3;
     plotOptions.plotFaces = true;
     [vertex,faces,faceNormals,facePatchTest] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
-    resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
-    resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
-    resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
-    resultRight = IsCollisionCurtain(rightMatrix,faces,vertex,faceNormals);
+    [resultFront,resultBack,resultLeft,resultRight] = lightCurtainCheck(frontMatrix,backMatrix,leftMatrix,leftMatrix,faces,vertex,faceNormals);
     k = k + 0.03;
     if resultFront == 1
-        frontPeri = 1;
         break
     end
     if resultBack == 1
-        backPeri = 1;
         break
     end   
     if resultLeft == 1
-        leftPeri = 1;
         break
     end
     if resultRight == 1
-        rightPeri = 1;
         break
     end
     pause(0.1)
     delete(facePatchTest);
 end 
 
-delete(facePatchTest);
 pause(1); 
+delete(facePatchTest);
 b = stepDone;
 
+%move the cube away . if the cube isnt collided with the light curtain then
+%the robot continue to moves in it trajectory 
 for a = k:-0.03:-2
     centerpnt = [a,0,0.15];
     side = 0.3;
     plotOptions.plotFaces = true;
     [vertex,faces,faceNormals,facePatchTest] = RectangularPrism(centerpnt-side/2,centerpnt+side/2,plotOptions);
-    resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
-    resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
-    resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
-    resultRight = IsCollisionCurtain(rightMatrix,faces,vertex,faceNormals);
-    if (resultFront == 0) && (frontPeri == 1)
-       b = b+1;
-       if b == 50
-           b = 49;
-       end  
-       Dobot.model.animate(Trajectory(b,:));
-    end
-    
-    if (resultBack == 0) && (backPeri == 1)
-       b = b+1;
-       if b == 50
-           b = 49;
-       end 
-       Dobot.model.animate(Trajectory(b,:));
-    end
-    
-    if (resultLeft == 0) && (leftPeri == 1)
-       b = b+1;
-       if b == 50
-           b = 49;
-       end 
-       Dobot.model.animate(Trajectory(b,:));
-   end
-   
-    if (resultRight == 0) && (rightPeri == 1)
+    [resultFront,resultBack,resultLeft,resultRight] = lightCurtainCheck(frontMatrix,backMatrix,leftMatrix,leftMatrix,faces,vertex,faceNormals);
+    if (resultFront == 0) && (resultBack == 0) && (resultLeft == 0) && (resultRight ==0)
        b = b+1;
        if b == 50
            b = 49;
@@ -101,7 +64,6 @@ for a = k:-0.03:-2
     pause(0.1)
     delete(facePatchTest);
 end
-
 
 %% Draw light curtain 
 function [front_,back_,left_,right_] = drawLightCurtain(defaultV,side)
@@ -203,3 +165,10 @@ end
 
 result = 1;                      % intersectP is in Triangle
 end
+%% Check LightCurtain  collision 
+function [resultFront,resultBack,resultLeft,resultRight] = lightCurtainCheck(frontMatrix,backMatrix,leftMatrix,rightMatrix,faces,vertex,faceNormals)
+    resultFront = IsCollisionCurtain(frontMatrix,faces,vertex,faceNormals);
+    resultBack = IsCollisionCurtain(backMatrix,faces,vertex,faceNormals);
+    resultLeft = IsCollisionCurtain(leftMatrix,faces,vertex,faceNormals);
+    resultRight = IsCollisionCurtain(rightMatrix,faces,vertex,faceNormals);
+end 

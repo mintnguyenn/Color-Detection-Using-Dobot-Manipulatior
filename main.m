@@ -1,11 +1,11 @@
 %% Setup
 clear; clc; clf;
-% rosshutdown();
-% rosinit();
+usingRealRobot = false;
 
-% GUI = DobotGUI();
-
-usingRealRobot = true;
+if usingRealRobot
+rosshutdown();
+rosinit();
+end
 
 qHomeReal  = [0 0.7862 0.7844 0];
 qHomeModel = [qHomeReal(1) qHomeReal(2) (pi/2)-qHomeReal(2)+qHomeReal(3) (pi/2)-qHomeReal(3) qHomeReal(4)];

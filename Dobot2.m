@@ -24,7 +24,6 @@ classdef Dobot2 < handle
             % robot = 
             self.GetDobot(base);
             self.PlotAndColourDobot(pose);
-
         end
 
         %% GetDobot

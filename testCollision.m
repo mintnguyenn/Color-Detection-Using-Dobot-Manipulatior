@@ -207,7 +207,6 @@ for i = 1:length(links)
     transforms(:,:,i + 1) = current_transform;
 end
 end
-
 %% FineInterpolation
 % Use results from Q2.6 to keep calling jtraj until all step sizes are
 % smaller than a given max steps size

@@ -71,9 +71,10 @@ for a = k:-0.03:-2
 end
 
 %% Draw light curtain 
-function [front_,back_,left_,right_] = drawLightCurtain(defaultV,side)
+function [front_,back_,left_,right_] = drawLightCurtain()
 % Plot front 
-    height = defaultV;
+    height = 0.95;
+    side = 0.8;
     for i =1:10
         front_{i}=[-side ,side ,height ;side ,side ,height ];
         height = height+0.1;  
@@ -82,7 +83,8 @@ function [front_,back_,left_,right_] = drawLightCurtain(defaultV,side)
         plot3(front_{i}(:,1),front_{i}(:,2),front_{i}(:,3),'r');
     end
 % Plot back 
-    height = defaultV;
+    height = 0.95;
+    side = 0.8;
     for i =1:10
         back_{i}=[-side ,-side ,height ;side ,-side ,height ];
         height = height +0.1; 
@@ -91,7 +93,8 @@ function [front_,back_,left_,right_] = drawLightCurtain(defaultV,side)
         plot3(back_{i}(:,1),back_{i}(:,2),back_{i}(:,3),'r');
     end
 % Plot left
-    height = defaultV;
+    height = 0.95;
+    side = 0.8;
     for i =1:10
         left_{i}=[-side ,-side ,height ;-side ,side ,height ];
         height = height+0.1;  
@@ -100,7 +103,8 @@ function [front_,back_,left_,right_] = drawLightCurtain(defaultV,side)
         plot3(left_{i}(:,1),left_{i}(:,2),left_{i}(:,3),'r');
     end
 % Plot right
-    height = defaultV;
+    height = 0.95;
+    side = 0.8;
     for i =1:10
         right_{i}=[side ,-side ,height ;side ,side ,height ];
         height = height+0.1;  

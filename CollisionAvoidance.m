@@ -3,13 +3,12 @@
 % x = 0.2; y = 0.25; z = 0.1
 % function [] = CollisionAvoidance(x,y,z)
 clear all
-set(0,'DefaultFigureWindowStyle','docked')
 clc
 clf
 
 xCen = 0.2;
 yCen = 0.25;
-zCen = 0.1;
+zCen = 1;
 %For TokenSorterDobot
 % qTeach = [0 0.7862 1.5690 0.7864 0];
 % qHomeReal = [0 0.7862 0.7844 0];
@@ -18,24 +17,43 @@ zCen = 0.1;
 qHomeReal  = [0 0.7862 0.7844 0];
 qHomeModel = [qHomeReal(1) qHomeReal(2) (pi/2)-qHomeReal(2)+qHomeReal(3) (pi/2)-qHomeReal(3) qHomeReal(4)];
 qHome = qHomeModel;
-base = transl(0, 0, 0.138);
+base = transl(0, 0, 1.05);
 
 dobot = Dobot2(base, qHome);
 hold on;
 % axis ([-0.5, 0.5, -0.5, 0.5, -0.6, 0.8]);
 
 %% Set up for Token
-locationRed     = [0.181  0   0.001];
-locationGreen   = [0.181  0.1 0.001];
-destinationRed   = [0.05 0.25 0.001];
-destinationGreen = [0.10 0.25 0.001];
+locationRed     = [0.181  0   0.91];
+locationGreen   = [0.181  0.1 0.91];
+destinationRed   = [0.05 0.25 0.91];
+destinationGreen = [0.10 0.25 0.91];
+locationRedTray = [0.05 0.25 0.91];
+locationTable = [0,0,0.75];
+locationFire = [1.5,0.5,0.45];
+locationFence = [0,0,0]; 
+locationLightCurtain1 = [0.8,0.8,1.5];
+locationLightCurtain2 = [0.8,-0.8,1.5];
+locationLightCurtain3 = [-0.8,-0.8,1.5];
+locationLightCurtain4 = [-0.8,0.8,1.5];
+locationE_Stop = [1.5,0,0.92];
 % for GUI
 % self.tokenRed1   = PlotObject('tokenred.ply'  , self.locationRed1);
 % self.tokenGreen1 = PlotObject('tokengreen.ply', self.locationGreen1);
 
 % for Testing
+[frontMatrix,backMatrix,leftMatrix,rightMatrix] = drawLightCurtain();
 tokenRed = PlotObject('tokenred.ply', locationRed);
 tokenGreen = PlotObject('tokengreen.ply', locationGreen);
+PlotObject('red_tray.ply' , locationRedTray);
+PlotObject('table.ply' , locationTable);
+PlotObject('fire.ply' , locationFire);
+PlotObject('lightcurtain.ply' , locationLightCurtain1);
+PlotObject('lightcurtain.ply' , locationLightCurtain2);
+PlotObject('lightcurtain.ply' , locationLightCurtain3);
+PlotObject('lightcurtain.ply' , locationLightCurtain4);
+PlotObject('estop1.ply' , locationE_Stop);
+surf([-2,-2;3,3],[-3,3;-3,3],[0.01,0.01;0.01,0.01],'CData',imread('s_concrete.jpg'),'FaceColor','texturemap');
 
 %% Set up the Obstacle
 centerpnt = [xCen,  yCen, zCen];
@@ -251,4 +269,47 @@ end
             qMatrix = [qMatrix ; FineInterpolation(waypointRadians(i,:),waypointRadians(i+1,:),maxStepRadians)]; %#ok<AGROW>
         end
     end
+    %% Draw light curtain 
+    function [front_,back_,left_,right_] = drawLightCurtain()
+% Plot front 
+    height = 0.95;
+    side = 0.8;
+    for i =1:10
+        front_{i}=[-side ,side ,height ;side ,side ,height ];
+        height = height+0.1;  
+    end
+    for i =1:10
+        plot3(front_{i}(:,1),front_{i}(:,2),front_{i}(:,3),'r');
+    end
+% Plot back 
+    height = 0.95;
+    side = 0.8;
+    for i =1:10
+        back_{i}=[-side ,-side ,height ;side ,-side ,height ];
+        height = height +0.1; 
+    end
+    for i =1:10
+        plot3(back_{i}(:,1),back_{i}(:,2),back_{i}(:,3),'r');
+    end
+% Plot left
+    height = 0.95;
+    side = 0.8;
+    for i =1:10
+        left_{i}=[-side ,-side ,height ;-side ,side ,height ];
+        height = height+0.1;  
+    end
+    for i =1:10
+        plot3(left_{i}(:,1),left_{i}(:,2),left_{i}(:,3),'r');
+    end
+% Plot right
+    height = 0.95;
+    side = 0.8;
+    for i =1:10
+        right_{i}=[side ,-side ,height ;side ,side ,height ];
+        height = height+0.1;  
+    end
+    for i =1:10
+        plot3(right_{i}(:,1),right_{i}(:,2),right_{i}(:,3),'r');
+    end
+end
 % end
